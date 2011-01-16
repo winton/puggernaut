@@ -1,8 +1,8 @@
-unless defined?(GemTemplate::Gems)
+unless defined?(Puggernaut::Gems)
   
   require 'yaml'
   
-  module GemTemplate
+  module Puggernaut
     module Gems
       class <<self
         

@@ -1,13 +1,11 @@
-name: gem_template
+name: puggernaut
 version: 0.1.0
 authors:
-  -
-email:
-homepage:
-summary:
-description:
+  - Winton Welsh
+email: mail@wintoni.us
+homepage: http://github.com/winton/puggernaut
+summary: Simple server push implementation using eventmachine and long polling
+description: Simple server push implementation using eventmachine and long polling
 dependencies:
-  -
-development_dependencies:
-  - rake
-  - rspec
+  - eventmachine
+development_dependencies: null

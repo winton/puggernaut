@@ -1,13 +1,13 @@
-require File.dirname(__FILE__) + '/lib/gem_template/gems'
+require File.dirname(__FILE__) + '/lib/puggernaut/gems'
 
-GemTemplate::Gems.activate %w(rake rspec)
+Puggernaut::Gems.activate %w(rake rspec)
 
 require 'rake'
 require 'spec/rake/spectask'
 
 def gemspec
   @gemspec ||= begin
-    file = File.expand_path('../gem_template.gemspec', __FILE__)
+    file = File.expand_path('../puggernaut.gemspec', __FILE__)
     eval(File.read(file), binding, file)
   end
 end
@@ -29,9 +29,9 @@ task :gem do
   root = File.expand_path('../', __FILE__)
   pkg = "#{root}/pkg"
   system "rm -Rf #{pkg}"
-  GemTemplate::Gems.gemset_names.each do |gemset|
+  Puggernaut::Gems.gemset_names.each do |gemset|
     ENV['GEMSET'] = gemset.to_s
-    system "cd #{root} && gem build gem_template.gemspec"
+    system "cd #{root} && gem build puggernaut.gemspec"
     system "mkdir -p #{pkg} && mv *.gem pkg"
   end
   ENV['GEMSET'] = old_gemset
@@ -63,17 +63,17 @@ namespace :gems do
     gemset = ENV['GEMSET']
     sudo = ENV['SUDO'] == '1' ? 'sudo' : ''
     
-    GemTemplate::Gems.gemset = gemset if gemset
+    Puggernaut::Gems.gemset = gemset if gemset
     
     if dev
-      gems = GemTemplate::Gems.gemspec.development_dependencies
+      gems = Puggernaut::Gems.gemspec.development_dependencies
     else
-      gems = GemTemplate::Gems.gemspec.dependencies
+      gems = Puggernaut::Gems.gemspec.dependencies
     end
     
     gems.each do |name|
       name = name.to_s
-      version = GemTemplate::Gems.versions[name]
+      version = Puggernaut::Gems.versions[name]
       if Gem.source_index.find_name(name, version).empty?
         version = version ? "-v #{version}" : ''
         system "#{sudo} gem install #{name} #{version} #{docs}"

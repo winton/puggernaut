@@ -1,4 +1,4 @@
 require 'spec_helper'
 
-describe GemTemplate do
+describe Puggernaut do
 end

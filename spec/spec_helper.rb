@@ -1,11 +1,11 @@
 require 'pp'
 
 $root = File.expand_path('../../', __FILE__)
-require "#{$root}/lib/gem_template/gems"
+require "#{$root}/lib/puggernaut/gems"
 
-GemTemplate::Gems.activate :rspec
+Puggernaut::Gems.activate :rspec
 
-require "#{$root}/lib/gem_template"
+require "#{$root}/lib/puggernaut"
 
 Spec::Runner.configure do |config|
 end
