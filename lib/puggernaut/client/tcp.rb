@@ -24,7 +24,7 @@ module Puggernaut
       end
       
       def send_data(data)
-        callback{ super(data) } 
+        callback { super(data) } 
       end
       
       def unbind 
