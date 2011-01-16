@@ -11,7 +11,7 @@ module Puggernaut
           room, message = line.split('|', 1)
           room = Puggernaut.rooms[room] ||= Room.new(room)
           id = room.say message
-          logger.info "#{Time.now} message #{id} sent to #{room.room}"
+          logger.info "#{Time.now} Message #{id} sent to #{room.room}"
         end
       end
     end

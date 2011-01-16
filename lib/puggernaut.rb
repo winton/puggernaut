@@ -11,5 +11,19 @@ require 'puggernaut/client'
 require 'puggernaut/server'
 
 module Puggernaut
-  # snort snort
+  class <<self
+    
+    attr_accessor :env
+    
+    def logger
+      unless @logger
+        base = File.expand_path('../../', __FILE__)
+        FileUtils.mkdir_p("#{base}/log")
+        file = File.open("#{base}/log/#{env}.log", 'a')
+        file.sync = true
+        @logger = Logger.new(file)
+      end
+      @logger
+    end
+  end
 end

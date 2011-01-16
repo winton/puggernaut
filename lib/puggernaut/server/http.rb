@@ -11,19 +11,19 @@ module Puggernaut
         method, request, version = lines.shift.split(' ', 3)
 
         if request.nil?
-          logger.error "#{Time.now} strange request: #{[method, request, version].inspect}"
+          logger.error "#{Time.now} Strange request: #{[method, request, version].inspect}"
           close_connection
           return
         else
           path, query = request.split('?', 2)
-          logger.info "#{Time.now} request on #{path} with #{query}"
+          logger.info "#{Time.now} Request on #{path} with #{query}"
           query = CGI.parse(query) if not query.nil?
         end
 
         if path == '/'
           if query && query['rooms']
             @rooms = query['rooms'].split(',').inject([]) do |array, room|
-              array << (Puggernaut.rooms[room] ||= Room.new(room))
+              array << (Puggernaut::Server.rooms[room] ||= Room.new(room))
               array
             end
             if query['last']
@@ -33,7 +33,7 @@ module Puggernaut
                 array
               }.join("\n")
             else
-              EventMachine::Timer.new(30) { respond }
+              EM::Timer.new(30) { respond }
               @subscription_ids = @rooms.collect do |room|
                 room.subscribe { |str| respond str }
               end
