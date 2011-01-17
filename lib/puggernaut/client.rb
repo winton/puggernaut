@@ -45,23 +45,26 @@ module Puggernaut
     
     private
     
-    def send(host, port, data, try_again=true)
-      if try_again
-        @retry.length.times do
-          host, port, data = @retry.shift
-          @connections.delete("#{host}:#{port}")
-          send host, port, data, false
-        end
-      end
+    def send(host, port, data, try_retry=true)
+      try if try_retry
       begin
         logger.info "Client#send - #{host}:#{port} - #{data}"
         connection = connect(host, port)
         connection.print(data)
-        raise 'not ok' unless connection.gets.include?('OK')
+        response = connection.gets
+        raise 'not ok' if !response || !response.include?('OK')
       rescue Exception => e
         logger.info "Client#send - Exception - #{e.message} - #{host}:#{port} - #{data}"
         @retry << [ host, port, data ]
         @retry.shift if @retry.length > 10
+      end
+    end
+    
+    def try
+      @retry.length.times do
+        host, port, data = @retry.shift
+        @connections.delete("#{host}:#{port}")
+        send host, port, data, false
       end
     end
   end

@@ -12,10 +12,13 @@ module Puggernaut
       
       def all_messages_after(identifier)
         found = false
-        @messages.select { |(id, message)|
-          found = true if id == identifier
-          found
-        }[1..-1].collect { |message|
+        (
+          @messages.select { |(id, message)|
+            found = true if id == identifier
+            found
+          }[1..-1] || []
+          
+        ).collect { |message|
           "#{@room}|#{message.join '|'}"
         }
       end

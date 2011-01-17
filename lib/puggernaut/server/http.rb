@@ -24,9 +24,8 @@ module Puggernaut
 
         if path == '/'
           if query && !query['room'].empty?
-            @rooms = query['room'].inject([]) do |array, room|
-              array << (Puggernaut::Server.rooms[room] ||= Room.new(room))
-              array
+            @rooms = query['room'].collect do |room|
+              Puggernaut::Server.rooms[room] ||= Room.new(room)
             end
             if query['last'] && !query['last'].empty?
               last = query['last'].dup
