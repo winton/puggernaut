@@ -13,5 +13,4 @@ require 'puggernaut/client'
 require 'puggernaut/server'
 
 module Puggernaut
-  # snort snort
 end

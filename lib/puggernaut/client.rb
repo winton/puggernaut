@@ -7,10 +7,10 @@ module Puggernaut
     
     attr_accessor :connections
     
-    def initialize(servers={})
+    def initialize(*servers)
       @connections = {}
       @retry = []
-      @servers = servers
+      @servers = servers.collect { |s| s.split(':') }
     end
     
     def close
@@ -20,7 +20,7 @@ module Puggernaut
       end
     end
     
-    def say(messages)
+    def push(messages)
       messages.each do |room, message|
         message =
           if message.is_a?(::Array)
@@ -28,7 +28,7 @@ module Puggernaut
           else
             "#{room}|#{message}"
           end
-        @servers.each do |host, port|
+        @servers.each do |(host, port)|
           send host, port, message
         end
       end
