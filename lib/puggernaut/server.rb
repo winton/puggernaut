@@ -5,6 +5,8 @@ require 'puggernaut/server/tcp'
 module Puggernaut
   class Server
     
+    include Logger
+    
     class <<self
       attr_accessor :rooms
     end
@@ -30,10 +32,6 @@ module Puggernaut
           logger.error "\t" + $!.backtrace.join("\n\t")
         end
       end
-    end
-    
-    def logger
-      Puggernaut.logger
     end
   end
 end

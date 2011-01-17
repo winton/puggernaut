@@ -4,9 +4,7 @@ module Puggernaut
   class Server
     module Http
 
-      def logger
-        Puggernaut.logger
-      end
+      include Logger
 
       def receive_data(data)
         lines = data.split(/[\r\n]+/)
