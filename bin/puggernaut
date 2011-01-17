@@ -2,9 +2,4 @@
 
 require File.expand_path(File.dirname(__FILE__) + "/../lib/puggernaut")
 
-env = ARGV.index('-e')
-port = ARGV.index('-p')
-env = ARGV[env + 1] if env
-port = ARGV[port + 1].to_i if port
-
-Puggernaut::Server.new(*[ env || 'development', port ].compact)
+Puggernaut::Server.new(*[ ARGV[0] ? ARGV[0].to_i : nil ].compact)

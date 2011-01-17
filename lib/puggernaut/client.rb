@@ -6,8 +6,7 @@ module Puggernaut
     
     attr_accessor :connections
     
-    def initialize(env='development', servers={})
-      Puggernaut.env = env
+    def initialize(servers={})
       @connections = {}
       @retry = []
       @servers = servers

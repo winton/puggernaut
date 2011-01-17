@@ -14,13 +14,11 @@ require 'puggernaut/server'
 module Puggernaut
   class <<self
     
-    attr_accessor :env
-    
     def logger
       unless @logger
-        base = File.expand_path('../../', __FILE__)
+        base = Dir.pwd
         FileUtils.mkdir_p("#{base}/log")
-        file = File.open("#{base}/log/#{env}.log", 'a')
+        file = File.open("#{base}/log/puggernaut.log", 'a')
         file.sync = true
         @logger = Logger.new(file)
       end

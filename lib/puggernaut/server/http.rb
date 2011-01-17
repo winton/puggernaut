@@ -39,7 +39,7 @@ module Puggernaut
             else
               EM::Timer.new(30) { respond }
               @subscription_ids = @rooms.collect do |room|
-                logger.info "Server::Http#receive_data - Subscribed - #{room}"
+                logger.info "Server::Http#receive_data - Subscribed - #{room.room}"
                 room.subscribe { |str| respond str }
               end
             end
@@ -70,7 +70,7 @@ module Puggernaut
           @subscription_ids.each do |id|
             room = @rooms.shift
             room.unsubscribe(id)
-            logger.info "Sever::Http#unbind - #{room} - #{id}"
+            logger.info "Sever::Http#unbind - #{room.room} - #{id}"
           end
         end
       end

@@ -9,9 +9,7 @@ module Puggernaut
       attr_accessor :rooms
     end
     
-    def initialize(env='development', port=8000)
-      Puggernaut.env = env
-      
+    def initialize(port=8000)
       loop do
         begin
           GC.start
