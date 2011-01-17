@@ -13,12 +13,12 @@ module Puggernaut
         method, request, version = lines.shift.split(' ', 3)
 
         if request.nil?
-          logger.error "Strange request: #{[method, request, version].inspect}"
+          logger.error "Server::Http#receive_data - Strange request - #{[method, request, version].inspect}"
           close_connection
           return
         else
           path, query = request.split('?', 2)
-          logger.info "Request on #{path} with #{query}"
+          logger.info "Server::Http#receive_data - Request - #{path} - #{query}"
           query = CGI.parse(query) if not query.nil?
         end
 
@@ -31,7 +31,7 @@ module Puggernaut
             if query['last'] && !query['last'].empty?
               last = query['last'].dup
               last = @rooms.inject([]) { |array, room|
-                array += room.all_messages_after(last.pop)
+                array += room.all_messages_after(last.shift)
                 array
               }.join("\n")
             end
@@ -40,7 +40,7 @@ module Puggernaut
             else
               EM::Timer.new(30) { respond }
               @subscription_ids = @rooms.collect do |room|
-                logger.info "Waiting for message from room #{room}"
+                logger.info "Server::Http#receive_data - Subscribed - #{room}"
                 room.subscribe { |str| respond str }
               end
             end
@@ -53,7 +53,7 @@ module Puggernaut
       end
 
       def respond(body='', status=200, content_type='text/plain; charset=utf-8')
-        logger.info "Response #{status}: #{body}"
+        logger.info "Server::Http#respond - #{status} - #{body}"
         response = [
           "HTTP/1.1 %d Puggernaut",
           "Content-length: %d",
@@ -69,7 +69,9 @@ module Puggernaut
       def unbind
         if @subscription_ids
           @subscription_ids.each do |id|
-            @rooms.pop.unsubscribe(id)
+            room = @rooms.shift
+            room.unsubscribe(id)
+            logger.info "Sever::Http#unbind - #{room} - #{id}"
           end
         end
       end

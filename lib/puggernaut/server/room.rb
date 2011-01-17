@@ -17,13 +17,18 @@ module Puggernaut
           found
         }[1..-1].collect { |message|
           "#{@room}|#{message.join '|'}"
-        }.join("\n")
+        }
+      end
+      
+      def logger
+        Puggernaut.logger
       end
   
       def say(message)
         message = [ rand.to_s[2..-1], message ]
         @messages << message
-        @messages.pop if @messages.length > 100
+        @messages.shift if @messages.length > 100
+        logger.info "Server::Room#say - #{@room} - #{message[0]} - #{message[1]}"
         push "#{@room}|#{message.join '|'}"
         message[0]
       end

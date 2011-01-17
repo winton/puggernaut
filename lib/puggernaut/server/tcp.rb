@@ -8,10 +8,10 @@ module Puggernaut
       
       def receive_data(data)
         data.split("\n").each do |line|
-          room, message = line.split('|', 1)
-          room = Puggernaut.rooms[room] ||= Room.new(room)
+          room, message = line.split('|', 2)
+          room = Puggernaut::Server.rooms[room] ||= Room.new(room)
           id = room.say message
-          logger.info "Message #{id} sent to #{room.room}"
+          send_data "OK\n"
         end
       end
     end

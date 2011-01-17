@@ -18,17 +18,17 @@ module Puggernaut
           self.class.rooms = {}
           EM.epoll if EM.epoll?
           EM.run do
-            logger.info "Starting HTTP server on port #{port}"
+            logger.info "Server#initialize - Starting HTTP - #{port}"
             EM.start_server '0.0.0.0', port, Http
             
-            logger.info "Starting TCP server on port #{port+1}"
+            logger.info "Server#initialize - Starting TCP - #{port+1}"
             EM.start_server '0.0.0.0', port + 1, Tcp
           end
         rescue Interrupt
-          logger.info "Shuting down server..."
+          logger.info "Server#initialize - Shutting down"
           exit
         rescue
-          logger.error "Error: " + $!.message
+          logger.error "Server#initialize - Error - #{$!.message}"
           logger.error "\t" + $!.backtrace.join("\n\t")
         end
       end
