@@ -74,13 +74,16 @@ location /long_poll {
 Receive push messages
 ---------------------
 
-Add [puggernaut.js](/winton/puggernaut/public/puggernaut.js) to your HTML page.
+Include [puggernaut.js](/winton/puggernaut/public/puggernaut.js) into to your HTML page.
 
 Javascript client example:
 
 <pre>
-var pug = Puggernaut('/long_poll');
-pug.pull('channel', function(message) {
-  // do something with message here
-});
+Puggernaut('/long_poll')
+  .watch('channel', function(message) {
+    // do something with message
+  })
+  .watch('channel_2', function(message) {
+    // do something with message
+  });
 </pre>
