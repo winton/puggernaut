@@ -18,7 +18,7 @@ module Puggernaut
         messages.each do |room, messages|
           messages.each do |message|
             send_data "#{room}|#{message}"
-            logger.info "#{Time.now} Said #{message} to #{room}"
+            logger.info "Said #{message} to #{room}"
           end
         end
       end

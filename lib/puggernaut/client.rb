@@ -6,7 +6,7 @@ module Puggernaut
       
       EM.epoll if EM.epoll?
       @connections = servers.inject([]) do |array, (host, port)|
-        logger.info "#{Time.now} Starting TCP client for #{host}:#{port}"
+        logger.info "Starting TCP client for #{host}:#{port}"
         array << EM.connect(host, port, Tcp)
       end
     end

@@ -7,6 +7,7 @@ module Puggernaut
       def initialize(room)
         @messages = []
         @room = room
+        super()
       end
       
       def all_messages_after(identifier)

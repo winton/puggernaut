@@ -4,6 +4,7 @@ Puggernaut::Gems.activate %w(eventmachine)
 
 require 'eventmachine'
 require 'logger'
+require 'fileutils'
 
 $:.unshift File.dirname(__FILE__)
 
