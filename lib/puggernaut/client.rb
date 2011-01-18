@@ -51,6 +51,7 @@ module Puggernaut
         @retry << [ host, port, data ]
         @retry.shift if @retry.length > 10
       end
+      try if try_retry
     end
     
     def try

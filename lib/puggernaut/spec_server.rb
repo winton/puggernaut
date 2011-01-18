@@ -24,10 +24,30 @@ class SpecServer < Sinatra::Base
     redirect '/spec.html'
   end
   
-  get '/basic/push' do
+  get '/single' do
     begin
       client = Puggernaut::Client.new("localhost:8001")
-      client.push :basic => "basic message"
+      client.push :single => "single message"
+      client.close
+    rescue Exception => e
+      e.message
+    end
+  end
+  
+  get '/multiple' do
+    begin
+      client = Puggernaut::Client.new("localhost:8001")
+      client.push :multiple => [ "multiple message 1", "multiple message 2" ]
+      client.close
+    rescue Exception => e
+      e.message
+    end
+  end
+  
+  get '/last/:count' do
+    begin
+      client = Puggernaut::Client.new("localhost:8001")
+      client.push :last => "last message #{params[:count]}"
       client.close
     rescue Exception => e
       e.message

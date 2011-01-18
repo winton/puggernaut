@@ -3,6 +3,7 @@ var Puggernaut = new function() {
 	var $ = jQuery;
 	var self = this;
 	
+	this.disabled = false;
 	this.path = '/long_poll';
 	this.unwatch = unwatch;
 	this.watch = watch;
@@ -12,24 +13,36 @@ var Puggernaut = new function() {
 	var started = false;
 	
 	function ajax() {
-		started = true;
-		$.ajax({
-			cache: false,
-			data: params(),
-			dataType: 'text',
-			error: ajax,
-			success: function(data) {
-				$.each(data.split("\n"), function(i, line) {
-					line = line.split('|', 3);
-					channels[line[0]] = line[1];
-					events.trigger('watch.' + line[0], line[2]);
-				});
-				ajax();
-			},
-			timeout: 100000,
-			traditional: true,
-			url: self.path
+		if (channelLength() > 0 && !self.disabled) {
+			started = true;
+			$.ajax({
+				cache: false,
+				data: params(),
+				dataType: 'text',
+				error: ajax,
+				success: function(data) {
+					$.each(data.split("\n"), function(i, line) {
+						line = line.split('|', 3);
+						if (typeof channels[line[0]] != 'undefined')
+							channels[line[0]] = line[1];
+						events.trigger('watch.' + line[0], line[2]);
+					});
+					ajax();
+				},
+				timeout: 100000,
+				traditional: true,
+				url: self.path
+			});
+		} else
+			started = false;
+	}
+	
+	function channelLength() {
+		var length = 0;
+		$.each(channels, function(channel, last) {
+			length += 1;
 		});
+		return length;
 	}
 	
 	function params() {
@@ -43,13 +56,19 @@ var Puggernaut = new function() {
 	}
 	
 	function unwatch() {
-		var args = $.map(arguments, function(item) {
+		var args = $.makeArray(arguments);
+		if (args[args.length-1].constructor == String)
+			$.each(args, function(i, item) {
+				delete channels[item];
+			});
+		args = $.map(args, function(item) {
 			if (item.constructor == String)
 				return 'watch.' + item;
 			else
 				return item;
 		});
 		events.unbind.apply(events, args);
+		return this;
 	}
 	
 	function watch() {
@@ -65,5 +84,7 @@ var Puggernaut = new function() {
 			if (!started)
 				ajax();
 		}
+		
+		return this;
 	}
 };
