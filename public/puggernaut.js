@@ -9,18 +9,23 @@ var Puggernaut = new function() {
 	this.watch = watch;
 	
 	var channels = {};
+	var errors = 0;
 	var events = $('<div/>');
 	var started = false;
 	
 	function ajax() {
-		if (channelLength() > 0 && !self.disabled) {
+		if (channelLength() > 0 && !self.disabled && errors <= 10) {
 			started = true;
 			$.ajax({
 				cache: false,
 				data: params(),
 				dataType: 'text',
-				error: ajax,
+				error: function() {
+					errors += 1;
+					ajax();
+				},
 				success: function(data) {
+					errors = 0;
 					$.each(data.split("\n"), function(i, line) {
 						line = line.split('|', 3);
 						if (typeof channels[line[0]] != 'undefined')

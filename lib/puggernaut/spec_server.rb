@@ -53,4 +53,14 @@ class SpecServer < Sinatra::Base
       e.message
     end
   end
+  
+  get '/multiple/channels' do
+    begin
+      client = Puggernaut::Client.new("localhost:8001")
+      client.push :single => "single message", :multiple => [ "multiple message 1", "multiple message 2" ]
+      client.close
+    rescue Exception => e
+      e.message
+    end
+  end
 end

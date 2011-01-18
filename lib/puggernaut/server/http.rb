@@ -21,25 +21,23 @@ module Puggernaut
         end
 
         if path == '/'
-          if query && !query['channel'].empty?
-            @channels = query['channel'].collect do |channel|
-              Puggernaut::Server.channels[channel] ||= Channel.new(channel)
-            end
-            if query['last'] && !query['last'].empty?
-              last = query['last'].dup
-              last = @channels.inject([]) { |array, channel|
-                array += channel.all_messages_after(last.shift)
+          channels = query['channel'].dup rescue []
+          lasts = query['last'].dup rescue []
+          
+          unless channels.empty?
+            @channel = Channel.create(channels)
+            unless lasts.empty?
+              lasts = channels.inject([]) { |array, channel|
+                array += Channel.all_messages_after(channel, lasts.shift)
                 array
               }.join("\n")
             end
-            if last && !last.empty?
-              respond last
+            unless lasts.empty?
+              respond lasts
             else
               EM::Timer.new(30) { respond }
-              @subscription_ids = @channels.collect do |channel|
-                logger.info "Server::Http#receive_data - Subscribed - #{channel.channel}"
-                channel.subscribe { |str| respond str }
-              end
+              logger.info "Server::Channel#create - Subscribed - #{@channel.channels.join(", ")}"
+              @subscription_id = @channel.subscribe { |str| respond str }
             end
           else
             respond "no channel specified", 500
@@ -64,12 +62,10 @@ module Puggernaut
       end
 
       def unbind
-        if @subscription_ids
-          @subscription_ids.each do |id|
-            channel = @channels.shift
-            channel.unsubscribe(id)
-            logger.info "Sever::Http#unbind - #{channel.channel} - #{id}"
-          end
+        if @subscription_id
+          @channel.unsubscribe(@subscription_id)
+          Channel.channels.delete @channel
+          logger.info "Sever::Http#unbind - Unsubscribe - #{@subscription_id}"
         end
       end
     end

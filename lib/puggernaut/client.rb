@@ -22,15 +22,16 @@ module Puggernaut
     end
     
     def push(messages)
-      messages.each do |channel, message|
-        message =
-          if message.is_a?(::Array)
-            message.collect { |m| "#{channel}|#{m}" }.join("\n")
-          else
-            "#{channel}|#{message}"
-          end
+      messages = messages.collect do |channel, message|
+        if message.is_a?(::Array)
+          message.collect { |m| "#{channel}|#{m}" }.join("\n")
+        else
+          "#{channel}|#{message}"
+        end
+      end
+      unless messages.empty?
         @servers.each do |(host, port)|
-          send host, port, message
+          send host, port, messages.join("\n")
         end
       end
     end

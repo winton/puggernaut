@@ -11,10 +11,7 @@ module Puggernaut
           hash[channel] << message
           hash
         end
-        messages.each do |channel, messages|
-          channel = Puggernaut::Server.channels[channel] ||= Channel.new(channel)
-          channel.say messages.join("\n")
-        end
+        Channel.say messages
         send_data "OK\n"
       end
     end

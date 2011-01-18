@@ -7,20 +7,16 @@ module Puggernaut
     
     include Logger
     
-    class <<self
-      attr_accessor :channels
-    end
-    
     def initialize(http_port=8000, tcp_port=http_port+1)
-      puts "Puggernaut is starting on #{http_port} (HTTP) and #{tcp_port} (TCP)"
-      puts "*snort*"
+      puts "\nPuggernaut is starting on #{http_port} (HTTP) and #{tcp_port} (TCP)"
+      puts "*snort*\n\n"
       
       errors = 0
       
       while errors <= 10
         begin
+          Channel.channels = []
           GC.start
-          self.class.channels = {}
           EM.epoll if EM.epoll?
           EM.run do
             logger.info "Server#initialize - Starting HTTP - #{http_port}"
@@ -28,8 +24,9 @@ module Puggernaut
             
             logger.info "Server#initialize - Starting TCP - #{tcp_port}"
             EM.start_server '0.0.0.0', tcp_port, Tcp
+            
+            errors = 0
           end
-          errors = 0
         rescue Interrupt
           logger.info "Server#initialize - Shutting down"
           exit
@@ -39,6 +36,9 @@ module Puggernaut
           logger.error "\t" + $!.backtrace.join("\n\t")
         end
       end
+      
+      puts "Exiting because of too many consecutive errors :("
+      puts "Check #{Dir.pwd}/log/puggernaut.log\n\n"
     end
   end
 end
