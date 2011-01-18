@@ -1,5 +1,5 @@
 require 'puggernaut/server/http'
-require 'puggernaut/server/room'
+require 'puggernaut/server/channel'
 require 'puggernaut/server/tcp'
 
 module Puggernaut
@@ -8,17 +8,19 @@ module Puggernaut
     include Logger
     
     class <<self
-      attr_accessor :rooms
+      attr_accessor :channels
     end
     
     def initialize(http_port=8000, tcp_port=http_port+1)
       puts "Puggernaut is starting on #{http_port} (HTTP) and #{tcp_port} (TCP)"
       puts "*snort*"
       
-      loop do
+      errors = 0
+      
+      while errors <= 10
         begin
           GC.start
-          self.class.rooms = {}
+          self.class.channels = {}
           EM.epoll if EM.epoll?
           EM.run do
             logger.info "Server#initialize - Starting HTTP - #{http_port}"
@@ -27,10 +29,12 @@ module Puggernaut
             logger.info "Server#initialize - Starting TCP - #{tcp_port}"
             EM.start_server '0.0.0.0', tcp_port, Tcp
           end
+          errors = 0
         rescue Interrupt
           logger.info "Server#initialize - Shutting down"
           exit
         rescue
+          errors += 1
           logger.error "Server#initialize - Error - #{$!.message}"
           logger.error "\t" + $!.backtrace.join("\n\t")
         end

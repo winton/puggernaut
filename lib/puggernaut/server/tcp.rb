@@ -6,14 +6,14 @@ module Puggernaut
       
       def receive_data(data)
         messages = data.split("\n").inject({}) do |hash, line|
-          room, message = line.split('|', 2)
-          hash[room] ||= []
-          hash[room] << message
+          channel, message = line.split('|', 2)
+          hash[channel] ||= []
+          hash[channel] << message
           hash
         end
-        messages.each do |room, messages|
-          room = Puggernaut::Server.rooms[room] ||= Room.new(room)
-          room.say messages.join("\n")
+        messages.each do |channel, messages|
+          channel = Puggernaut::Server.channels[channel] ||= Channel.new(channel)
+          channel.say messages.join("\n")
         end
         send_data "OK\n"
       end

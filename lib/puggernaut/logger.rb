@@ -1,3 +1,6 @@
+require 'logger'
+require 'fileutils'
+
 module Puggernaut
   module Logger
     

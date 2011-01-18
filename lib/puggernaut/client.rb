@@ -1,3 +1,4 @@
+require "#{File.dirname(__FILE__)}/logger"
 require 'socket'
 
 module Puggernaut
@@ -16,17 +17,17 @@ module Puggernaut
     def close
       @connections.each do |host_port, connection|
         connection.close
-        logger.info "Client#close - #{http_port}"
+        logger.info "Client#close - #{host_port}"
       end
     end
     
     def push(messages)
-      messages.each do |room, message|
+      messages.each do |channel, message|
         message =
           if message.is_a?(::Array)
-            message.collect { |m| "#{room}|#{m}" }.join("\n")
+            message.collect { |m| "#{channel}|#{m}" }.join("\n")
           else
-            "#{room}|#{message}"
+            "#{channel}|#{message}"
           end
         @servers.each do |(host, port)|
           send host, port, message

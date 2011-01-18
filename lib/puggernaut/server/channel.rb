@@ -1,14 +1,14 @@
 module Puggernaut
   class Server
-    class Room < EM::Channel
+    class Channel < EM::Channel
       
       include Logger
       
-      attr_reader :messages, :room
+      attr_reader :messages, :channel
   
-      def initialize(room)
+      def initialize(channel)
         @messages = []
-        @room = room
+        @channel = channel
         super()
       end
       
@@ -21,7 +21,7 @@ module Puggernaut
           }[1..-1] || []
           
         ).collect { |message|
-          "#{@room}|#{message.join '|'}"
+          "#{@channel}|#{message.join '|'}"
         }
       end
   
@@ -30,8 +30,8 @@ module Puggernaut
           message = [ rand.to_s[2..-1], message ]
           @messages << message
           @messages.shift if @messages.length > 100
-          logger.info "Server::Room#say - #{@room} - #{message[0]} - #{message[1]}"
-          "#{@room}|#{message.join '|'}"
+          logger.info "Server::Channel#say - #{@channel} - #{message[0]} - #{message[1]}"
+          "#{@channel}|#{message.join '|'}"
         }.join("\n")
       end
     end

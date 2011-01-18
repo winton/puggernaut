@@ -21,14 +21,14 @@ module Puggernaut
         end
 
         if path == '/'
-          if query && !query['room'].empty?
-            @rooms = query['room'].collect do |room|
-              Puggernaut::Server.rooms[room] ||= Room.new(room)
+          if query && !query['channel'].empty?
+            @channels = query['channel'].collect do |channel|
+              Puggernaut::Server.channels[channel] ||= Channel.new(channel)
             end
             if query['last'] && !query['last'].empty?
               last = query['last'].dup
-              last = @rooms.inject([]) { |array, room|
-                array += room.all_messages_after(last.shift)
+              last = @channels.inject([]) { |array, channel|
+                array += channel.all_messages_after(last.shift)
                 array
               }.join("\n")
             end
@@ -36,13 +36,13 @@ module Puggernaut
               respond last
             else
               EM::Timer.new(30) { respond }
-              @subscription_ids = @rooms.collect do |room|
-                logger.info "Server::Http#receive_data - Subscribed - #{room.room}"
-                room.subscribe { |str| respond str }
+              @subscription_ids = @channels.collect do |channel|
+                logger.info "Server::Http#receive_data - Subscribed - #{channel.channel}"
+                channel.subscribe { |str| respond str }
               end
             end
           else
-            respond "no room specified", 500
+            respond "no channel specified", 500
           end
         else
           respond "not found", 404
@@ -66,9 +66,9 @@ module Puggernaut
       def unbind
         if @subscription_ids
           @subscription_ids.each do |id|
-            room = @rooms.shift
-            room.unsubscribe(id)
-            logger.info "Sever::Http#unbind - #{room.room} - #{id}"
+            channel = @channels.shift
+            channel.unsubscribe(id)
+            logger.info "Sever::Http#unbind - #{channel.channel} - #{id}"
           end
         end
       end
