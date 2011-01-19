@@ -3,7 +3,7 @@ Puggernaut
 
 Simple server push implementation using eventmachine and long polling.
 
-![Puggernaut](/winton/puggernaut/raw/master/puggernaut.png)
+![Puggernaut](https://github.com/winton/puggernaut/raw/master/puggernaut.png)
 
 Requirements
 ------------
@@ -74,7 +74,7 @@ The <code>Client.new</code> initializer accepts any number of TCP server address
 Receive push messages
 ---------------------
 
-Include [puggernaut.js](/winton/puggernaut/public/puggernaut.js) into to your HTML page.
+Include [jQuery](http://jquery.com) and [puggernaut.js](https://github.com/winton/puggernaut/public/puggernaut.js) into to your HTML page.
 
 Javascript client example:
 
@@ -91,3 +91,31 @@ Puggernaut
 
 Puggernaut.unwatch('channel');
 </pre>
+
+Running specs
+-------------
+
+Specs are a work in progress, though we can vouch for some of the functionality :).
+
+Set up Nginx to point to a cloned copy of this project:
+
+*nginx.conf*
+
+<pre>
+server {
+	listen 80;
+	server_name localhost;
+	root /Users/me/puggernaut/public;
+	passenger_enabled on;
+	
+	location /long_poll {
+		proxy_pass http://localhost:8000/;
+	}
+}
+</pre>
+
+You have now set up an instance of [Puggernaut's spec server](https://github.com/winton/puggernaut/blob/master/lib/puggernaut/spec_server.rb).
+
+Start up an instance of Puggernaut by calling <code>bin/puggernaut</code>.
+
+When you visit <code>http://localhost</code> you will find a page that executes [QUnit specs](https://github.com/winton/puggernaut/blob/master/public/spec.js).

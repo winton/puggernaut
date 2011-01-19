@@ -64,8 +64,8 @@ module Puggernaut
       def unbind
         if @subscription_id
           @channel.unsubscribe(@subscription_id)
+          logger.info "Sever::Http#unbind - Unsubscribe - #{@channel.channels.join(", ")}"
           Channel.channels.delete @channel
-          logger.info "Sever::Http#unbind - Unsubscribe - #{@subscription_id}"
         end
       end
     end

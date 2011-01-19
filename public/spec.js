@@ -60,7 +60,7 @@ $(function() {
 	
 	module("Multiple channels");
 	
-	test("should receive a message", function() {
+	test("should receive all messages", function() {
 		stop();
 		
 		var executions = 0;
