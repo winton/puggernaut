@@ -116,6 +116,6 @@ server {
 
 You have now set up an instance of [Puggernaut's spec server](https://github.com/winton/puggernaut/blob/master/lib/puggernaut/spec_server.rb).
 
-Start up an instance of Puggernaut by calling <code>bin/puggernaut</code>.
+Start up an instance of Puggernaut by running <code>bin/puggernaut</code>.
 
 When you visit <code>http://localhost</code> you will find a page that executes [QUnit specs](https://github.com/winton/puggernaut/blob/master/public/spec.js).
