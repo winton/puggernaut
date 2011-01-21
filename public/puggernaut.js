@@ -62,17 +62,20 @@ var Puggernaut = new function() {
 	
 	function unwatch() {
 		var args = $.makeArray(arguments);
-		if (args[args.length-1].constructor == String)
-			$.each(args, function(i, item) {
-				delete channels[item];
+		if (args.length) {
+			if (args[args.length-1].constructor == String)
+				$.each(args, function(i, item) {
+					delete channels[item];
+				});
+			args = $.map(args, function(item) {
+				if (item.constructor == String)
+					return 'watch.' + item;
+				else
+					return item;
 			});
-		args = $.map(args, function(item) {
-			if (item.constructor == String)
-				return 'watch.' + item;
-			else
-				return item;
-		});
-		events.unbind.apply(events, args);
+			events.unbind.apply(events, args);
+		} else
+			events.unbind('watch');
 		return this;
 	}
 	
