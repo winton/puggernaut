@@ -30,7 +30,7 @@ var Puggernaut = new function() {
 						line = line.split('|', 3);
 						if (typeof channels[line[0]] != 'undefined')
 							channels[line[0]] = line[1];
-						events.trigger('watch.' + line[0], line[2]);
+						events.trigger(line[0], line[2]);
 					});
 					ajax();
 				},
@@ -75,7 +75,7 @@ var Puggernaut = new function() {
 			});
 			events.unbind.apply(events, args);
 		} else
-			events.unbind('watch');
+			events.unbind();
 		return this;
 	}
 	
@@ -86,7 +86,7 @@ var Puggernaut = new function() {
 		if (ch.length && fn) {
 			$.each(ch, function(i, item) {
 				channels[item] = channels[item] || null;
-				events.bind('watch.' + item, fn);
+				events.bind(item, fn);
 			});
 			
 			if (!started)
