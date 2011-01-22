@@ -61,7 +61,10 @@ module Puggernaut
                 }.join("\n")
               end
             end
-            channel.push push.compact.join("\n")
+            push = push.compact
+            unless push.empty?
+              channel.push push.join("\n")
+            end
           end
         end
       end
