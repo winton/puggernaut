@@ -30,7 +30,7 @@ Run the <code>puggernaut</code> binary with optional port numbers:
 puggernaut &lt;http port&gt; &lt;tcp port&gt;
 </pre>
 
-The default HTTP and TCP ports are 8000 and 8001, respectively.
+The default HTTP and TCP ports are 8100 and 8101, respectively.
 
 Set up proxy pass
 -----------------
@@ -44,8 +44,8 @@ If you do not see your web server below, [Google](http://google.com) is your fri
 *http.conf*
 
 <pre>
-ProxyPass /long_poll http://localhost:8000/
-ProxyPassReverse /long_poll http://localhost:8000/
+ProxyPass /long_poll http://localhost:8100/
+ProxyPassReverse /long_poll http://localhost:8100/
 </pre>
 
 ### Nginx
@@ -54,7 +54,7 @@ ProxyPassReverse /long_poll http://localhost:8000/
 
 <pre>
 location /long_poll {
-  proxy_pass http://localhost:8000/;
+  proxy_pass http://localhost:8100/;
 }
 </pre>
 
@@ -64,7 +64,7 @@ Send push messages
 <pre>
 require 'puggernaut'
 
-client = Puggernaut::Client.new("localhost:8001", "localhost:9001")
+client = Puggernaut::Client.new("localhost:8101", "localhost:9101")
 client.push :channel => "message"
 client.push :channel => [ "message 1", "message 2" ], :channel_2 => "message"
 </pre>
@@ -109,7 +109,7 @@ server {
 	passenger_enabled on;
 	
 	location /long_poll {
-		proxy_pass http://localhost:8000/;
+		proxy_pass http://localhost:8100/;
 	}
 }
 </pre>

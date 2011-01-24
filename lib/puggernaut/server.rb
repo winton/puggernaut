@@ -7,7 +7,7 @@ module Puggernaut
     
     include Logger
     
-    def initialize(http_port=8000, tcp_port=http_port+1)
+    def initialize(http_port=8100, tcp_port=http_port.to_i+1)
       puts "\nPuggernaut is starting on #{http_port} (HTTP) and #{tcp_port} (TCP)"
       puts "*snort*\n\n"
       
