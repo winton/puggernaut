@@ -1,4 +1,5 @@
 require 'cgi'
+require 'time'
 
 module Puggernaut
   class Server
@@ -23,25 +24,39 @@ module Puggernaut
         if path == '/'
           channels = query['channel'].dup rescue []
           lasts = query['last'].dup rescue []
+          time = query['time'].dup[0] rescue nil
+          user_id = query['user_id'].dup[0] rescue nil
           
           unless channels.empty?
-            @channel = Channel.create(channels)
-            unless lasts.empty?
-              lasts = channels.inject([]) { |array, channel|
-                array += Channel.all_messages_after(channel, lasts.shift)
+            @channel = Channel.create(channels, user_id)
+            messages = []
+            if time
+              messages = channels.inject([]) { |array, channel|
+                array += Channel.all_messages_after_time(channel, Time.parse(time))
+                array
+              }.join("\n")
+            elsif !lasts.empty?
+              messages = channels.inject([]) { |array, channel|
+                array += Channel.all_messages_after_id(channel, lasts.shift)
                 array
               }.join("\n")
             end
-            unless lasts.empty?
-              respond lasts
+            unless messages.empty?
+              respond messages
             else
               EM::Timer.new(30) { respond }
-              logger.info "Server::Channel#create - Subscribed - #{@channel.channels.join(", ")}"
+              logger.info "Server::Http#receive_data - Subscribed - #{@channel.channels.join(", ")}"
               @subscription_id = @channel.subscribe { |str| respond str }
             end
           else
             respond "no channel specified", 500
           end
+        elsif path == '//inhabitants'
+          channels = query['channel'].dup rescue []
+          user_ids = channels.collect do |c|
+            Channel.inhabitants(c)
+          end
+          respond user_ids.flatten.uniq.join('|')
         else
           respond "not found", 404
         end

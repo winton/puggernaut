@@ -2,31 +2,32 @@ module Puggernaut
   class Server
     class Channel < EM::Channel
       
-      include Logger
+      attr_reader :channels, :user_id
       
-      attr_reader :channels
-      
-      def initialize(channels)
+      def initialize(channels, user_id)
         @channels = channels
+        @user_id = user_id
         super()
       end
       
       class <<self
+
+        include Logger
         
         attr_accessor :channels
         
-        def create(channels)
-          channel = self.new(channels)
+        def create(channels, user_id)
+          channel = self.new(channels, user_id)
           @channels ||= []
           @channels << channel
           channel
         end
         
-        def all_messages_after(channel, identifier)
+        def all_messages_after_id(channel, identifier)
           if @messages && @messages[channel]
             found = false
             (
-              @messages[channel].select { |(id, message)|
+              @messages[channel].select { |(id, message, time)|
                 found = true if id == identifier
                 found
               }[1..-1] || []
@@ -38,17 +39,39 @@ module Puggernaut
             []
           end
         end
+
+        def all_messages_after_time(channel, after_time)
+          if @messages && @messages[channel]
+            (
+              @messages[channel].select { |(id, message, time)|
+                after_time < time
+              } || []
+
+            ).collect { |message|
+              "#{channel}|#{message.join '|'}"
+            }
+          else
+            []
+          end
+        end
+
+        def inhabitants(channel_name)
+          user_ids = @channels.collect do |channel|
+            channel.user_id if channel.channels.include?(channel_name)
+          end
+          user_ids.compact
+        end
         
         def say(messages)
           @messages ||= {}
           messages = messages.inject({}) do |hash, (channel_name, messages)|
             messages = messages.collect do |message|
-              [ rand.to_s[2..-1], message ]
+              [ rand.to_s[2..-1], message, Time.now ]
             end
             @messages[channel_name] ||= []
             @messages[channel_name] += messages
-            if @messages[channel_name].length > 100
-              @messages[channel_name] = @messages[channel_name][-100..-1]
+            @messages[channel_name] = @messages[channel_name].select do |message|
+              message[2] >= Time.now - 2 * 60 * 60
             end
             hash[channel_name] = messages
             hash

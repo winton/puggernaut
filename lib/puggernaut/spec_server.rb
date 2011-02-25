@@ -26,7 +26,7 @@ class SpecServer < Sinatra::Base
   
   get '/single' do
     begin
-      client = Puggernaut::Client.new("localhost:8001")
+      client = Puggernaut::Client.new("localhost:8101")
       client.push :single => "single message"
       client.close
     rescue Exception => e
@@ -36,7 +36,7 @@ class SpecServer < Sinatra::Base
   
   get '/multiple' do
     begin
-      client = Puggernaut::Client.new("localhost:8001")
+      client = Puggernaut::Client.new("localhost:8101")
       client.push :multiple => [ "multiple message 1", "multiple message 2" ]
       client.close
     rescue Exception => e
@@ -46,7 +46,7 @@ class SpecServer < Sinatra::Base
   
   get '/last/:count' do
     begin
-      client = Puggernaut::Client.new("localhost:8001")
+      client = Puggernaut::Client.new("localhost:8101")
       client.push :last => "last message #{params[:count]}"
       client.close
     rescue Exception => e
@@ -56,7 +56,7 @@ class SpecServer < Sinatra::Base
   
   get '/multiple/channels' do
     begin
-      client = Puggernaut::Client.new("localhost:8001")
+      client = Puggernaut::Client.new("localhost:8101")
       client.push :single => "single message", :multiple => [ "multiple message 1", "multiple message 2" ]
       client.close
     rescue Exception => e

@@ -79,7 +79,7 @@ Include [jQuery](http://jquery.com) and [puggernaut.js](https://github.com/winto
 Javascript client example:
 
 <pre>
-Puggernaut.path = '/long_poll';
+Puggernaut.path = '/long_poll'; // (default)
 
 Puggernaut
   .watch('channel', function(e, message) {

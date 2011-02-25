@@ -1,5 +1,6 @@
 require "#{File.dirname(__FILE__)}/logger"
 require 'socket'
+require 'timeout'
 
 module Puggernaut
   class Client
@@ -43,9 +44,12 @@ module Puggernaut
       begin
         host_port = "#{host}:#{port}"
         logger.info "Client#send - #{host_port} - #{data}"
-        connection = @connections[host_port] ||= TCPSocket.open(host, port)
-        connection.print(data)
-        response = connection.gets
+        response = nil
+        Timeout.timeout(10) do
+          connection = @connections[host_port] ||= TCPSocket.open(host, port)
+          connection.print(data)
+          response = connection.gets
+        end
         raise 'not ok' if !response || !response.include?('OK')
       rescue Exception => e
         logger.info "Client#send - Exception - #{e.message} - #{host_port} - #{data}"
