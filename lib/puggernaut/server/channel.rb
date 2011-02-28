@@ -62,7 +62,7 @@ module Puggernaut
           user_ids.compact
         end
         
-        def say(messages)
+        def say(messages, exclude_user_id=nil)
           @messages ||= {}
           messages = messages.inject({}) do |hash, (channel_name, messages)|
             messages = messages.collect do |message|
@@ -77,6 +77,7 @@ module Puggernaut
             hash
           end
           @channels.each do |channel|
+            next if exclude_user_id && channel.user_id == exclude_user_id
             push = channel.channels.collect do |channel_name|
               if messages[channel_name]
                 messages[channel_name].collect { |message|

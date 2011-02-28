@@ -72,6 +72,29 @@ $(function() {
 			start();
 		});
 	});
+
+	module("Single message join/leave/join", {
+		setup: function() {
+			Puggernaut
+				.watch('single', { join_leave: true }, function(e, message, time) {})
+				.watch_join('single', function(e, user_id) {
+					equals(user_id, 'test');
+					setTimeout(function() {
+						Puggernaut.unwatch('single');
+						start();
+					}, 1000);
+				})
+				.watch_leave('single', function(e, user_id) {
+					ok(false);
+				});
+		}
+	});
+	
+	test("should trigger join event without leave", function() {
+		stop();
+		expect(1);
+		$.get('/join_leave_join');
+	});
 	
 	module("Multiple messages", {
 		setup: function() {

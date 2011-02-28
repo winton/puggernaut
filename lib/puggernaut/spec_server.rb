@@ -33,6 +33,18 @@ class SpecServer < Sinatra::Base
       e.message
     end
   end
+
+  get '/join_leave_join' do
+    begin
+      client = Puggernaut::Client.new("localhost:8101")
+      client.push :single => [
+        "!PUGJOINtest", "!PUGLEAVEtest", "!PUGJOINtest"
+      ]
+      client.close
+    rescue Exception => e
+      e.message
+    end
+  end
   
   get '/multiple' do
     begin
