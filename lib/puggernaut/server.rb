@@ -33,7 +33,6 @@ module Puggernaut
         logger.info "Server#initialize - Shutting down"
         exit
       rescue
-        errors += 1
         logger.error "Server#initialize - Error - #{$!.message}"
         logger.error "\t" + $!.backtrace.join("\n\t")
       end

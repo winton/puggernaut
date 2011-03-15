@@ -10,6 +10,7 @@ var Puggernaut = new function() {
 	this.watch = watch;
 	this.watch_join = watch_join;
 	this.watch_leave = watch_leave;
+	this.websockets_port = 8102;
 	
 	var channels = {};
 	var errors = 0;
@@ -188,7 +189,7 @@ var Puggernaut = new function() {
 	function websocket(join_leave, time, user_id) {
 		if (channelLength() > 0 && !self.disabled && errors <= 10) {
 			started = true;
-			request = new WebSocket("ws://localhost:8102/");
+			request = new WebSocket("ws://" + window.location.host + ":" + this.websockets_port + "/");
 			request.onopen = function() {
 				errors = 0;
 				if (started)

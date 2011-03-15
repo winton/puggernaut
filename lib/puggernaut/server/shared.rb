@@ -33,7 +33,6 @@ module Puggernaut
       end
       
       def query_defaults(query)
-        logger.info query.inspect
         [
           (query['channel'].dup rescue []),
           (query['join_leave'].dup[0] rescue nil),
