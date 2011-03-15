@@ -36,11 +36,11 @@ The default HTTP and TCP ports are 8100, 8101, and 8102, respectively.
 Set up proxy pass
 -----------------
 
-You will need to set up a URL on your public facing web server that points to the Puggernaut HTTP server.
+Set up a URL on your public facing web server that points to the Puggernaut HTTP server (long poll).
 
 We all use Nginx, right?
 
-*nginx.conf*
+### nginx.conf
 
 <pre>
 server {
@@ -92,7 +92,7 @@ Specs are a work in progress, though we can vouch for some of the functionality 
 
 Set up Nginx to point to a cloned copy of this project:
 
-*nginx.conf*
+### nginx.conf
 
 <pre>
 server {
