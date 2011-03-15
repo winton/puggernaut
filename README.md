@@ -15,11 +15,12 @@ gem install puggernaut
 How it works
 ------------
 
-Puggernaut consists of three pieces:
+Puggernaut consists of four pieces:
 
 * TCP client to send push messages
 * TCP server to receive push messages
-* HTTP server to deliver long poll requests
+* TCP server to deliver messages via WebSockets ([em-websocket](https://github.com/igrigorik/em-websocket))
+* HTTP server to deliver messages via long poll
 
 Start it up
 -----------
@@ -27,34 +28,25 @@ Start it up
 Run the <code>puggernaut</code> binary with optional port numbers:
 
 <pre>
-puggernaut &lt;http port&gt; &lt;tcp port&gt;
+puggernaut &lt;http port&gt; &lt;tcp port&gt; &lt;tcp port (websocket)&gt;
 </pre>
 
-The default HTTP and TCP ports are 8100 and 8101, respectively.
+The default HTTP and TCP ports are 8100, 8101, and 8102, respectively.
 
 Set up proxy pass
 -----------------
 
 You will need to set up a URL on your public facing web server that points to the Puggernaut HTTP server.
 
-If you do not see your web server below, [Google](http://google.com) is your friend.
-
-### Apache
-
-*http.conf*
-
-<pre>
-ProxyPass /long_poll http://localhost:8100/
-ProxyPassReverse /long_poll http://localhost:8100/
-</pre>
-
-### Nginx
+We all use Nginx, right?
 
 *nginx.conf*
 
 <pre>
-location /long_poll {
-  proxy_pass http://localhost:8100/;
+server {
+	location /long_poll {
+	  proxy_pass http://localhost:8100/;
+	}
 }
 </pre>
 
@@ -79,7 +71,8 @@ Include [jQuery](http://jquery.com) and [puggernaut.js](https://github.com/winto
 Javascript client example:
 
 <pre>
-Puggernaut.path = '/long_poll'; // (default)
+Puggernaut.path = '/long_poll'; // (default long poll path)
+Puggernaut.port = 8102; 		// (default WebSocket port)
 
 Puggernaut
   .watch('channel', function(e, message) {

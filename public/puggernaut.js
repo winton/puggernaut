@@ -5,12 +5,12 @@ var Puggernaut = new function() {
 	
 	this.disabled = false;
 	this.path = '/long_poll';
+	this.port = 8102;
 	this.inhabitants = inhabitants;
 	this.unwatch = unwatch;
 	this.watch = watch;
 	this.watch_join = watch_join;
 	this.watch_leave = watch_leave;
-	this.webSocketPort = webSocketPort;
 	
 	var channels = {};
 	var errors = 0;
@@ -19,7 +19,6 @@ var Puggernaut = new function() {
 	var started = false;
 	var request;
 	var request_id;
-	var port = 8102;
 
 	function ajax(join_leave, time, user_id) {
 		if (channelLength() > 0 && !self.disabled && errors <= 10) {
@@ -190,7 +189,7 @@ var Puggernaut = new function() {
 	function websocket(join_leave, time, user_id) {
 		if (channelLength() > 0 && !self.disabled && errors <= 10) {
 			started = true;
-			request = new WebSocket("ws://" + window.location.host + ":" + webSocketPort() + "/");
+			request = new WebSocket("ws://" + window.location.host + ":" + self.port + "/");
 			request.onopen = function() {
 				errors = 0;
 				if (started)
@@ -215,10 +214,5 @@ var Puggernaut = new function() {
 					websocket(join_leave, null, user_id);
 			};
 		}
-	}
-	
-	function webSocketPort(p) {
-		if (p) port = p;
-		return port;
 	}
 };
