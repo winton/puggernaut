@@ -58,19 +58,23 @@ $(function() {
 
 	module("Single message inhabitants", {
 		setup: function() {
-			Puggernaut.watch('single', { user_id: 'test' }, function(e, message, time) {});
+			Puggernaut.watch('single', { user_id: 'test' }, function(e, message, time) {
+				setTimeout(function() {
+					Puggernaut.inhabitants('single', function(users) {
+						equals(users[0], 'test');
+						equals(users.length, 1);
+						Puggernaut.unwatch('single');
+						start();
+					});
+				}, 1000);
+			});
 		}
 	});
 	
 	test("should receive a message", function() {
 		stop();
 		expect(2);
-		Puggernaut.inhabitants('single', function(users) {
-			equals(users[0], 'test');
-			equals(users.length, 1);
-			Puggernaut.unwatch('single');
-			start();
-		});
+		$.get('/single');
 	});
 
 	module("Single message join/leave/join", {
@@ -120,19 +124,14 @@ $(function() {
 	module("Last message", {
 		setup: function() {
 			Puggernaut.watch('last', function(e, message, time) {
-				if (message != 'last message 2') {
-					equals(message, 'last message 1');
+				if (message == 'last message 1') {
 					ok(time.constructor === Date);
-					Puggernaut.disabled = true;
-					$.get('/last/2', function() {
-						Puggernaut.disabled = false;
-						Puggernaut.watch('last', function(e, message, time) {
-							equals(message, 'last message 2');
-							ok(time.constructor === Date);
-							Puggernaut.unwatch('last');
-							start();
-						});
-					});
+					$.get('/last/2');
+				}
+				if (message == 'last message 2') {
+					ok(time.constructor === Date);
+					Puggernaut.unwatch('last');
+					start();
 				}
 			});
 		}
@@ -140,7 +139,7 @@ $(function() {
 	
 	test("should pick up last message", function() {
 		stop();
-		expect(4);
+		expect(2);
 		$.get('/last/1');
 	});
 	

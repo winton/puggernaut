@@ -6,6 +6,7 @@ module Puggernaut
     module Http
 
       include Logger
+      include Shared
 
       def receive_data(data)
         lines = data.split(/[\r\n]+/)
@@ -22,33 +23,14 @@ module Puggernaut
         end
 
         if path == '/'
-          @join_leave = query['join_leave'].dup[0] rescue nil
-
-          channels = query['channel'].dup rescue []
-          lasts = query['last'].dup rescue []
-          time = query['time'].dup[0] rescue nil
-          user_id = query['user_id'].dup[0] rescue nil
+          channels, @join_leave, lasts, time, user_id = query_defaults(query)
           
           unless channels.empty?
             @channel = Channel.create(channels, user_id)
             if @join_leave && user_id
-              Channel.say channels.inject({}) { |hash, channel|
-                hash[channel] = "!PUGJOIN#{user_id}"
-                hash
-              }, user_id
+              join_channels(channels, user_id)
             end
-            messages = []
-            if time
-              messages = channels.inject([]) { |array, channel|
-                array += Channel.all_messages_after_time(channel, Time.parse(time))
-                array
-              }.join("\n")
-            elsif !lasts.empty?
-              messages = channels.inject([]) { |array, channel|
-                array += Channel.all_messages_after_id(channel, lasts.shift)
-                array
-              }.join("\n")
-            end
+            messages = gather_messages(channels, lasts, time)
             unless messages.empty?
               respond messages
             else
@@ -89,10 +71,7 @@ module Puggernaut
           @channel.unsubscribe(@subscription_id)
           logger.info "Sever::Http#unbind - Unsubscribe - #{@channel.channels.join(", ")}"
           if @join_leave && @channel.user_id
-            Channel.say @channel.channels.inject({}) { |hash, channel|
-              hash[channel] = "!PUGLEAVE#{@channel.user_id}"
-              hash
-            }, @channel.user_id
+            leave_channel(channel)
           end
           Channel.channels.delete @channel
         end

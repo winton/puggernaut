@@ -17,6 +17,7 @@ var Puggernaut = new function() {
 	var leaves = {};
 	var started = false;
 	var request;
+	var request_id;
 
 	function ajax(join_leave, time, user_id) {
 		if (channelLength() > 0 && !self.disabled && errors <= 10) {
@@ -35,24 +36,7 @@ var Puggernaut = new function() {
 					if (started) {
 						errors = 0;
 						$.each(data.split("\n"), function(i, line) {
-							line = line.split('|', 4);
-							if (line[0] && typeof channels[line[0]] != 'undefined') {
-								channels[line[0]] = line[1];
-								if (line[2].substring(0, 8) == '!PUGJOIN') {
-									var id = line[2].substring(8)
-									if (leaves[id]) {
-										delete leaves[id];
-										clearTimeout(leaves[id]);
-									} else
-										events.trigger('join_' + line[0], id);
-								} else if (line[2].substring(0, 9) == '!PUGLEAVE') {
-									var id = line[2].substring(9)
-									leaves[id] = setTimeout(function() {
-										events.trigger('leave_' + line[0], id);
-									}, 10000);
-								} else
-									events.trigger(line[0], [ line[2], new Date(line[3]) ]);
-							}
+							processMessage(line);
 						});
 						ajax(join_leave, null, user_id);
 					}
@@ -112,10 +96,35 @@ var Puggernaut = new function() {
 		return data;
 	}
 	
+	function processMessage(line) {
+		line = line.split('|', 4);
+		if (line[0] && typeof channels[line[0]] != 'undefined') {
+			var id;
+			channels[line[0]] = line[1];
+			if (line[2].substring(0, 8) == '!PUGJOIN') {
+				id = line[2].substring(8);
+				if (leaves[id]) {
+					delete leaves[id];
+					clearTimeout(leaves[id]);
+				} else
+					events.trigger('join_' + line[0], id);
+			} else if (line[2].substring(0, 9) == '!PUGLEAVE') {
+				id = line[2].substring(9);
+				leaves[id] = setTimeout(function() {
+					events.trigger('leave_' + line[0], id);
+				}, 10000);
+			} else
+				events.trigger(line[0], [ line[2], new Date(line[3]) ]);
+		}
+	}
+	
 	function unwatch() {
 		var args = $.makeArray(arguments);
 		started = false;
-		request.abort();
+		if (request.abort)
+			request.abort();
+		if (request.close)
+			request.close();
 		if (args.length) {
 			$.each(args, function(i, item) {
 				delete channels[item];
@@ -147,8 +156,12 @@ var Puggernaut = new function() {
 				events.bind(item, fn);
 			});
 			
-			if (!started)
-				ajax(join_leave, time, user_id);
+			if (!started) {
+				if (window.WebSocket)
+					websocket(join_leave, time, user_id);
+				else
+					ajax(join_leave, time, user_id);
+			}
 		}
 		
 		return this;
@@ -170,5 +183,35 @@ var Puggernaut = new function() {
 			events.bind('leave_' + item, fn);
 		});
 		return this;
+	}
+	
+	function websocket(join_leave, time, user_id) {
+		if (channelLength() > 0 && !self.disabled && errors <= 10) {
+			started = true;
+			request = new WebSocket("ws://localhost:8102/");
+			request.onopen = function() {
+				errors = 0;
+				if (started)
+					request.send($.param(params(join_leave, time, user_id), true));
+			};
+			request.onmessage = function(evt) {
+				errors = 0;
+				if (started) {
+					$.each(evt.data.split("\n"), function(i, line) {
+						processMessage(line);
+					});
+					request.send($.param(params(join_leave, null, user_id), true));
+				}
+			};
+			request.onerror = function() {
+				errors += 1;
+				if (started)
+					websocket(join_leave, null, user_id);
+			};
+			request.onclose = function() {
+				if (started)
+					websocket(join_leave, null, user_id);
+			};
+		}
 	}
 };

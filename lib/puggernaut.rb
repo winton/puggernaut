@@ -1,8 +1,9 @@
 require File.dirname(__FILE__) + '/puggernaut/gems'
 
-Puggernaut::Gems.activate %w(eventmachine)
+Puggernaut::Gems.activate %w(eventmachine em-websocket)
 
 require 'eventmachine'
+require 'em-websocket'
 
 $:.unshift File.dirname(__FILE__)
 
