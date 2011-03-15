@@ -7,5 +7,6 @@ homepage: http://github.com/winton/puggernaut
 summary: Simple server push implementation using eventmachine and long polling
 description: Simple server push implementation using eventmachine and long polling
 dependencies:
+  - em-websocket
   - eventmachine
 development_dependencies: null
