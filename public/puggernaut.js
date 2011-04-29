@@ -4,6 +4,7 @@ var Puggernaut = new function() {
 	var self = this;
 	
 	this.disabled = false;
+	this.host = window.location.host;
 	this.path = '/long_poll';
 	this.port = 8102;
 	this.inhabitants = inhabitants;
@@ -189,7 +190,7 @@ var Puggernaut = new function() {
 	function websocket(join_leave, time, user_id) {
 		if (channelLength() > 0 && !self.disabled && errors <= 10) {
 			started = true;
-			request = new WebSocket("ws://" + window.location.host + ":" + self.port + "/");
+			request = new WebSocket("ws://" + self.host + ":" + self.port + "/");
 			request.onopen = function() {
 				errors = 0;
 				if (started)

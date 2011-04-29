@@ -21,6 +21,8 @@ module Puggernaut
           logger.info "Server::Http#receive_data - Request - #{path} - #{query}"
           query = CGI.parse(query) if not query.nil?
         end
+        
+        puts path
 
         if path == '/'
           channels, @join_leave, lasts, time, user_id = query_defaults(query)

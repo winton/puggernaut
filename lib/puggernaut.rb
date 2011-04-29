@@ -4,6 +4,7 @@ Puggernaut::Gems.activate %w(eventmachine em-websocket)
 
 require 'eventmachine'
 require 'em-websocket'
+require 'memprof'
 
 $:.unshift File.dirname(__FILE__)
 

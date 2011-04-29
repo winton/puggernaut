@@ -1,6 +1,7 @@
 puggernaut:
   em-websocket: ~>0.2.1
   eventmachine: ~>0.12.10
+  memprof: ~>0.3.10
   rake: >=0.8.7
   rspec: ~>1.0
   sinatra: ~>1.1.0
