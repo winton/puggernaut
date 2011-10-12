@@ -14,7 +14,6 @@ module Puggernaut
       puts "*snort*\n\n"
 
       begin
-        Memprof.start
         Channel.channels = []
         EM.epoll if EM.epoll?
         EM.run do
@@ -29,8 +28,6 @@ module Puggernaut
           
           errors = 0
         end
-        Memprof.stats(Dir.pwd + '/log/puggernaut.mem.log')
-        Memprof.stop
       rescue Interrupt
         logger.info "Server#initialize - Shutting down"
         exit

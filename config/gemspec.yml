@@ -1,5 +1,5 @@
 name: puggernaut
-version: 0.2.2
+version: 0.2.3
 authors:
   - Winton Welsh
 email: mail@wintoni.us
@@ -9,5 +9,4 @@ description: Simple server push implementation using eventmachine and long polli
 dependencies:
   - em-websocket
   - eventmachine
-  - memprof
 development_dependencies: null
